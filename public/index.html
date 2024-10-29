@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated GIF Slicer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+
+    <h1 class="text-2xl font-bold mb-4">Animated GIF Slicer</h1>
+    
+    <input type="file" id="gifInput" accept="image/gif" class="mb-4 p-2 border border-gray-300 rounded">
+    
+    <button id="uploadBtn" class="bg-blue-500 text-white p-2 rounded hidden">Upload GIF</button>
+    
+    <div id="preview" class="mb-4"></div>
+
+    <div id="slices" class="preview-container grid grid-cols-5 gap-2"></div>
+
+    <script>
+        const gifInput = document.getElementById('gifInput');
+        const preview = document.getElementById('preview');
+        const slicesContainer = document.getElementById('slices');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        gifInput.addEventListener('change', () => {
+            const file = gifInput.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                preview.innerHTML = `<img src="${url}" alt="Preview GIF" class="w-full h-auto"/>`;
+                uploadBtn.classList.remove('hidden');
+            }
+        });
+
+        uploadBtn.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('gif', gifInput.files[0]);
+
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+
+            slicesContainer.innerHTML = '';
+            result.slices.forEach(slice => {
+                const img = document.createElement('img');
+                img.src = slice;
+                img.classList.add('slice', 'w-72', 'h-72');
+                slicesContainer.appendChild(img);
+            });
+        });
+    </script>
+</body>
+</html>
