@@ -1,10 +1,28 @@
 from flask import Flask, request, send_from_directory, jsonify
 from PIL import Image
+from PIL import ImageSequence
+
 import os
 import imageio
 
 app = Flask(__name__)
 output_dir = 'output'
+
+from PIL import Image
+
+def resize_gif(input_path, output_path, new_width, new_height):
+    # Abre o GIF
+    gif = Image.open(input_path)
+    frames = []
+
+    # Redimensiona cada frame
+    for frame in range(gif.n_frames):
+        gif.seek(frame)
+        resized_frame = gif.copy().resize((new_width, new_height))
+        frames.append(resized_frame)
+
+    # Salva o novo GIF
+    frames[0].save(output_path, save_all=True, append_images=frames[1:], loop=0, duration=gif.info['duration'])
 
 # Ensure the output directory exists
 if not os.path.exists(output_dir):
@@ -26,7 +44,10 @@ def upload_gif():
     gif_file.save(gif_path)
 
     # Load the GIF
+    resize_gif(gif_file, gif_path, 360, 216)
     gif = imageio.mimread(gif_path)
+
+    # Split the GIF into 15 slices
     width, height = gif[0].shape[1], gif[0].shape[0]
     frame_width = width // 5
     frame_height = height // 3
