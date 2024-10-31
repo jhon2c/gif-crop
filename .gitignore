@@ -141,4 +141,4 @@ data/
 
 *.gif
 
-*.zip
+/output/
