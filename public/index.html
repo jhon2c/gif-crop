@@ -6,7 +6,18 @@
 		<title>Animated GIF Slicer</title>
 		<script src="https://cdn.tailwindcss.com"></script>
 		<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+			rel="stylesheet"
+		/>
 		<style>
+			html,
+			body {
+				font-family: "Inter", sans-serif;
+				font-optical-sizing: auto;
+			}
 			.preview-container > img {
 				object-fit: cover;
 				max-width: 72px;
@@ -32,7 +43,7 @@
 		</style>
 	</head>
 	<body
-		class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4"
+		class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4"
 	>
 		<h1 class="text-3xl font-bold mb-6">Animated GIF Slicer</h1>
 
