@@ -1,8 +1,6 @@
 import os, imageio
 
 from flask import Flask, request, send_from_directory, jsonify
-from PIL import Image
-from PIL import ImageSequence
 
 from engine.utils.resize import Resize
 
