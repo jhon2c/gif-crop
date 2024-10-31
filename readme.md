@@ -1,4 +1,4 @@
-# Crop Gif
+# Gif Crop
 
 Para rodar o projeto, é preciso instalar as dependencias, instale com:
 
