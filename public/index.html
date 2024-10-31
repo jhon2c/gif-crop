@@ -1,71 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated GIF Slicer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .preview-container > img {
-            object-fit: cover;
-            max-width: 72px;
-            max-height: 72px;
-            border-radius: 1rem;
-        }
-        .slice {
-            object-fit: cover;
-        }
-    </style>
-</head>
-<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Animated GIF Slicer</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			html,
+			body {
+				font-family: "Inter", sans-serif;
+				font-optical-sizing: auto;
+			}
+			.preview-container > img {
+				object-fit: cover;
+				max-width: 72px;
+				max-height: 72px;
+				border-radius: 1rem;
+			}
+			.slice {
+				object-fit: cover;
+			}
+			progress {
+				width: 100%;
+				height: 12px;
+				border-radius: 10px; /* Rounded corners */
+				overflow: hidden;
+			}
+			progress::-webkit-progress-bar {
+				background-color: #e0e0e0; /* Background color */
+			}
+			progress::-webkit-progress-value {
+				background-color: #007bff; /* Blue color for progress */
+				border-radius: 10px; /* Smooth radius */
+			}
+		</style>
+	</head>
+	<body
+		class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4"
+	>
+		<h1 class="text-3xl font-bold mb-6">Animated GIF Slicer</h1>
 
-    <h1 class="text-2xl font-bold mb-4">Animated GIF Slicer</h1>
-    
-    <input type="file" id="gifInput" accept="image/gif" class="mb-4 p-2 border border-gray-300 rounded">
-    
-    <button id="uploadBtn" class="bg-blue-500 text-white p-2 rounded hidden">Upload GIF</button>
-    
-    <div id="preview" class="mb-4"></div>
+		<form
+			name="gifUpload"
+			id="form"
+			hx-encoding="multipart/form-data"
+			hx-post="/upload"
+			hx-target="#slices"
+			hx-swap="outerHTML"
+			class="mb-4"
+		>
+			<input
+				type="file"
+				name="gif"
+				id="gifInput"
+				accept="image/gif"
+				class="mb-4 p-2 border border-gray-300 rounded"
+				aria-label="Upload GIF"
+			/>
 
-    <div id="slices" class="preview-container grid grid-cols-5 gap-2 bg-slate-950 p-4 rounded-2xl"></div>
+			<button type="submit" class="bg-blue-500 text-white p-2 rounded">
+				Upload
+			</button>
 
-    <script>
-        const gifInput = document.getElementById('gifInput');
-        const preview = document.getElementById('preview');
-        const slicesContainer = document.getElementById('slices');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fragment = document.createDocumentFragment();
+			<progress
+				id="progress"
+				value="0"
+				max="100"
+				class="w-full mt-2 bg-transparent"
+			></progress>
+		</form>
 
-        gifInput.addEventListener('change', () => {
-            const file = gifInput.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                preview.innerHTML = `<img src="${url}" alt="Preview GIF" class="w-full h-auto"/>`;
-                uploadBtn.classList.remove('hidden');
-                slicesContainer.innerHTML = '';
-                fragment.querySelectorAll('.slice').forEach(slice => slice.remove());
-            }
-        });
+		<div id="preview" class="mb-4"></div>
 
-        uploadBtn.addEventListener('click', async () => {
-            const formData = new FormData();
-            formData.append('gif', gifInput.files[0]);
+		<div id="slices"></div>
 
-            const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData,
-            });
-            const result = await response.json();
+		<script>
+			// Handle progress updates during file upload
+			htmx.on("#form", "htmx:xhr:progress", function (evt) {
+				const progress = (evt.detail.loaded / evt.detail.total) * 100;
+				document.getElementById("progress").value = progress;
+			});
 
-            slicesContainer.innerHTML = '';
-            result.slices.forEach(slice => {
-            const img = document.createElement('img');
-            img.src = slice;
-            img.classList.add('slice', 'w-72', 'h-72');
-            fragment.appendChild(img);
-            });
-            slicesContainer.appendChild(fragment);
-        });
-    </script>
-</body>
+			const gifInput = document.getElementById("gifInput");
+			const preview = document.getElementById("preview");
+			const slicesContainer = document.getElementById("slices");
+
+			gifInput.addEventListener("change", () => {
+				const file = gifInput.files[0];
+				if (file) {
+					const url = URL.createObjectURL(file);
+					preview.innerHTML = `<img src="${url}" alt="Preview of uploaded GIF" class="w-full h-auto"/>`;
+					slicesContainer.innerHTML = ""; // Clear previous slices
+				}
+			});
+		</script>
+	</body>
 </html>

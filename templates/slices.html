@@ -1,0 +1,16 @@
+<div id="slices" class="max-w-3xl mx-auto">
+	<div
+		class="preview-container grid grid-cols-5 gap-2 bg-slate-950 p-4 rounded-2xl"
+	>
+		{% for slice in slices %}
+		<img src="{{ slice }}" class="slice w-72 h-72" />
+		{% endfor %}
+	</div>
+	<button
+		hx-get="/download/{{ session_id }}"
+		hx-trigger="click"
+		class="bg-blue-500 text-white p-2 rounded mt-4"
+	>
+		Download
+	</button>
+</div>
