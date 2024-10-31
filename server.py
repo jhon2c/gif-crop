@@ -3,6 +3,7 @@ import os, imageio
 from flask import Flask, request, send_from_directory, jsonify
 
 from engine.utils.resize import Resize
+from engine.utils.compress import Compress
 
 app = Flask(__name__)
 output_dir = 'output'
@@ -50,12 +51,18 @@ def upload_gif():
         slice_path = os.path.join(output_dir, f'slice{slice_index + 1}.gif')
         imageio.mimsave(slice_path, slice_gif, duration=0.1, loop=0)
         slices.append(f'/output/slice{slice_index + 1}.gif')
-
-    return jsonify({'message': 'GIF sliced successfully', 'slices': slices})
+    
+    zip_name = Compress.zip(output_dir)
+    return jsonify({'message': 'GIF sliced successfully', 'slices': slices, 'zip_file': zip_name})
 
 @app.route('/output/<path:filename>', methods=['GET'])
 def get_output(filename):
     return send_from_directory(output_dir, filename)
 
+@app.route('/download/<file>', methods=['GET'])
+def download_zip(file):
+    return send_from_directory('./', file)
+
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
+
