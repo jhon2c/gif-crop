@@ -83,20 +83,24 @@ def get_output(filename):
     return response
 
 @app.route('/download/<path:session_id>', methods=['GET'])
-def download_zip(session_id):
-    # Create a ZIP file with all the slices
-    with zipfile.ZipFile(os.path.join(output_dir, session_id, 'slices.zip'), 'w') as zipf:
+def create_download_zip(session_id):
+   
+    zip_path = os.path.join(output_dir, session_id, 'slices.zip')
+    
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
         for slice_index in range(15):
-            slice_path = os.path.join(output_dir, session_id, f'slice{slice_index + 1}.gif')
-            zipf.write(slice_path, f'slice{slice_index + 1}.gif')
+            slice_name = f'slice{slice_index + 1}.gif'
+            slice_path = os.path.join(output_dir, session_id, slice_name)
+            zipf.write(slice_path, slice_name)
         
     response = make_response(jsonify({'message': 'ZIP file created.'}))
-    response.headers['HX-Redirect'] = '/' + os.path.join(output_dir, session_id, 'slices.zip')
+    response.headers['HX-Redirect'] = f'/{output_dir}/{session_id}/slices.zip'
     return response
 
-@app.route('/download/<file>', methods=['GET'])
-def download_zip(file):
-    return send_from_directory('./', file) 
+@app.route('/download/file/<path:file>', methods=['GET'])
+def serve_download_file(file):
+    """Serve arquivos para download."""
+    return send_from_directory('./', file)
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
